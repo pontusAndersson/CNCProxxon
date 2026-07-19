@@ -65,6 +65,51 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 **Viktigt:** Signal-GND (Arduino ↔ TB6600) och effekt-GND (PSU ↔ TB6600) hålls som separata kretsar för att undvika brus, trots att båda till slut delar samma nollpunkt i systemet.
 
+## DIP-switchar (TB6600)
+
+Ställ in **alla tre** drivrutiner likadant. Justera **alltid med strömmen av**.
+
+**Val för detta projekt:** 1/4 microstep + 2.8 A.
+
+| Switch | Läge | Betydelse |
+|---|---|---|
+| SW1 | **ON** | |
+| SW2 | **OFF** | 1/4 microstep (800 puls/varv) |
+| SW3 | **OFF** | |
+| SW4 | **OFF** | |
+| SW5 | **OFF** | 2.8 A |
+| SW6 | **ON** | |
+
+Kort: `ON OFF OFF OFF OFF ON`
+
+### Referenstabeller (kontrollera etiketten på din TB6600 — kloner kan skilja sig)
+
+**Microstep (S1–S3):**
+
+| Microstep | Puls/varv | S1 | S2 | S3 |
+|---|---|---|---|---|
+| Full (1) | 200 | ON | ON | OFF |
+| 1/2 | 400 | ON | OFF | ON |
+| **1/4** | **800** | **ON** | **OFF** | **OFF** |
+| 1/8 | 1600 | OFF | ON | OFF |
+| 1/16 | 3200 | OFF | OFF | ON |
+| 1/32 | 6400 | OFF | OFF | OFF |
+
+**Ström (S4–S6):**
+
+| Ström | S4 | S5 | S6 |
+|---|---|---|---|
+| 0.5 A | ON | ON | ON |
+| 1.0 A | ON | OFF | ON |
+| 1.5 A | ON | ON | OFF |
+| 2.0 A | ON | OFF | OFF |
+| 2.5 A | OFF | ON | ON |
+| **2.8 A** | **OFF** | **OFF** | **ON** |
+| 3.0 A | OFF | ON | OFF |
+| 3.5 A | OFF | OFF | OFF |
+
+Vald microstepping måste matcha GRBL `$100/$101/$102` (steg/mm).
+
 ## Mjukvaruinstallation
 
 1. Installera [Arduino IDE](https://www.arduino.cc/en/software)
@@ -82,7 +127,7 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 
 ## Återstående arbete
 
-- [ ] Ställ in DIP-switchar på varje TB6600 (strömbegränsning ~1.8A enligt motorspec, microstepping enligt val)
+- [ ] Ställ in DIP-switchar på varje TB6600 enligt sektionen ovan (`ON OFF OFF OFF OFF ON`)
 - [ ] Beräkna och sätt `$100/$101/$102` (steg/mm) i GRBL utifrån kulskruvens stigning och vald microstepping
 - [ ] Koppla in ändlägesbrytare (shieldens X+/X-/Y+/Y-/Z+/Z- mot GND)
 - [ ] Första provkörning med låg hastighet/acceleration, öka stegvis
@@ -93,3 +138,5 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 - GRBL: https://github.com/gnea/grbl
 - UGS: https://winder.github.io/ugs_website/
 - Arduino IDE: https://www.arduino.cc/en/software
+
+

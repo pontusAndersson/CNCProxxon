@@ -156,7 +156,7 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 - Arduino IDE: https://www.arduino.cc/en/software
 
 
-Product description
+**CNC Shield product description**
 CNC Shield V3 is an expansion module designed for use with Arduino Uno R3 or R4. It simplifies control of up to four stepper motors in CNC applications such as milling machines, engravers, laser systems, and 3D printing projects. The module is used together with stepper motor drivers, for example A4988 or DRV8825 (not included). Each stepper motor requires only two digital I/O pins from the Arduino for control of step signals and direction. The module is compatible with the open-source GRBL software, which converts G-code into motor control commands via the Arduino USB connection. The PCB layout includes connections for microstepping configuration via jumpers, limit switches (endstops), as well as spindle and coolant signals, enabling expansion for both standard axes and additional functions in more advanced CNC systems.
 
 Specifications:

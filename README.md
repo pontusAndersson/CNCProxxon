@@ -110,6 +110,9 @@ Kort: `ON OFF OFF OFF OFF ON`
 
 Vald microstepping måste matcha GRBL `$100/$101/$102` (steg/mm).
 
+<img width="3024" height="4032" alt="IMG_1526" src="https://github.com/user-attachments/assets/854e0fff-7d5d-4755-b6cf-f0700efc435e" />
+
+
 ## Mjukvaruinstallation
 
 1. Installera [Arduino IDE](https://www.arduino.cc/en/software)

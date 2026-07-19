@@ -56,6 +56,7 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 <img width="1174" height="1601" alt="image" src="https://github.com/user-attachments/assets/fdebbdfe-bbed-4f82-b416-991dadde3765" />
 
+<img width="949" height="800" alt="image" src="https://github.com/user-attachments/assets/b91281bd-e02d-4fa9-86f1-89ced905e5a2" />
 
 
 

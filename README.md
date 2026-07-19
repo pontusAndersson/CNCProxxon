@@ -41,15 +41,14 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 ## Kopplingsschema
 
-**Signalsida (Arduino/Shield → TB6600), per axel:**
+**Signalsida (Arduino/Shield → TB6600), per axel — common cathode (gemensam −, styr med +):**
 
 | Shield-pin | TB6600-pin |
 |---|---|
-| X.STEP / Y.STEP / Z.STEP | PUL- |
-| X.DIR / Y.DIR / Z.DIR | DIR- |
-| 5V (shield) | PUL+ |
-| 5V (shield) | DIR+ |
-| GND (shield, delad mellan alla TB6600) | Gemensam signal-GND |
+| X.STEP / Y.STEP / Z.STEP | PUL+ |
+| X.DIR / Y.DIR / Z.DIR | DIR+ |
+| GND (shield, delad mellan alla TB6600) | PUL− |
+| GND (shield, samma) | DIR− |
 
 
 
@@ -87,8 +86,8 @@ Tabellerna nedan är avskrivna från etiketten på din TB6600 (kloner skiljer si
 | SW1 | **OFF** | |
 | SW2 | **ON** | 1/8 microstep (1600 puls/varv) |
 | SW3 | **OFF** | |
-| SW4 | **ON** | |
-| SW5 | **OFF** | 3.0 A (3.2 A peak) |
+| SW4 | **OFF** | |
+| SW5 | **ON** | 3.0 A (3.2 A peak) |
 | SW6 | **OFF** | |
 
 Kort: `OFF ON OFF ON OFF OFF`
@@ -149,29 +148,31 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 - [ ] Första provkörning med låg hastighet/acceleration, öka stegvis
 - [ ] Om drift kvarstår: överväg 36–48V PSU-uppgradering för mer marginal på Nema23
 
+## CNC Shield V3.0
+
+Expansionskort för Arduino Uno R3/R4 som bryter ut GRBL:s steg-/riktningssignaler till upp till fyra axlar. I detta projekt används shielden **utan** inbyggda A4988/DRV8825 — istället tas STEP/DIR/GND ut till externa TB6600-drivrutiner.
+
+### Specifikationer
+
+| | |
+|---|---|
+| Kompatibilitet | Arduino Uno R3/R4 |
+| Drivrutinssocklar | 4 (X, Y, Z, A) |
+| Tänkta drivrutiner | A4988 / DRV8825 *(används ej här)* |
+| Microstepping | Via jumpers på shielden *(irrelevant med TB6600 — ställs på drivrutinen)* |
+| Ändlägen | X+/X−, Y+/Y−, Z+/Z− |
+| Övrigt | Spindle enable/direction, coolant |
+| Motor matning (vid onboard-drivrutiner) | Extern DC 12–36 V |
+
+### Användning i detta projekt
+
+- Arduino Uno + GRBL ger pulser via USB (UGS)
+- Shielden ger praktiska anslutningspunkter för STEP, DIR och GND per axel
+- Motorström går **inte** via shielden — den matas direkt PSU → TB6600
+
 ## Resurser
 
 - GRBL: https://github.com/gnea/grbl
 - UGS: https://winder.github.io/ugs_website/
 - Arduino IDE: https://www.arduino.cc/en/software
-
-
-**CNC Shield product description**
-CNC Shield V3 is an expansion module designed for use with Arduino Uno R3 or R4. It simplifies control of up to four stepper motors in CNC applications such as milling machines, engravers, laser systems, and 3D printing projects. The module is used together with stepper motor drivers, for example A4988 or DRV8825 (not included). Each stepper motor requires only two digital I/O pins from the Arduino for control of step signals and direction. The module is compatible with the open-source GRBL software, which converts G-code into motor control commands via the Arduino USB connection. The PCB layout includes connections for microstepping configuration via jumpers, limit switches (endstops), as well as spindle and coolant signals, enabling expansion for both standard axes and additional functions in more advanced CNC systems.
-
-Specifications:
-
-Compatible with Arduino Uno R3/R4
-Number of stepper motor driver slots: 4
-Recommended stepper motor drivers: A4988 / DRV8825
-Control of up to four axes (X, Y, Z, and A/extra)
-Microstepping adjustable via jumpers
-Endstop connections for each axis
-Connections for spindle enable and direction
-Drive voltage from external DC source, 12–36 V
-For continuous operation, it is recommended that stepper motor drivers are fitted with heatsinks
-Supplied without stepper motor drivers and Arduino Uno
-Applications:
-
-The module is suitable for building small to medium-sized CNC machines, engravers, DIY tools, and prototypes where precise stepper motor control and modular expansion are required. It provides a modular foundation for integrating Arduino-based control systems in projects requiring multiple axes and standardized control interfaces.
 

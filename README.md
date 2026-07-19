@@ -53,7 +53,7 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 **Effektsida (PSU → TB6600), delad buss:**
 
-- PSU 24V+ → V+ på alla tre TB6600 (gemensam skruvplint)
+- PSU 24V+ → VCC på alla tre TB6600 (gemensam skruvplint)
 - PSU GND → GND på alla tre TB6600 (gemensam skruvplint)
 - Rekommenderad kabelarea: minst 1,5mm² på huvudmatning, 0,75–1mm² per TB6600-gren
 - Säkring (10–15A) rekommenderad mellan PSU och fördelningsplint
@@ -69,44 +69,48 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 Ställ in **alla tre** drivrutiner likadant. Justera **alltid med strömmen av**.
 
-**Val för detta projekt:** 1/4 microstep + 2.8 A.
+Tabellerna nedan är avskrivna från etiketten på din TB6600 (kloner skiljer sig — lita på lådan).
+
+**Val för detta projekt:** 1/8 microstep + 3.0 A (3.2 A peak).
 
 | Switch | Läge | Betydelse |
 |---|---|---|
-| SW1 | **ON** | |
-| SW2 | **OFF** | 1/4 microstep (800 puls/varv) |
+| SW1 | **OFF** | |
+| SW2 | **ON** | 1/8 microstep (1600 puls/varv) |
 | SW3 | **OFF** | |
-| SW4 | **OFF** | |
-| SW5 | **OFF** | 2.8 A |
-| SW6 | **ON** | |
+| SW4 | **ON** | |
+| SW5 | **OFF** | 3.0 A (3.2 A peak) |
+| SW6 | **OFF** | |
 
-Kort: `ON OFF OFF OFF OFF ON`
+Kort: `OFF ON OFF ON OFF OFF`
 
-### Referenstabeller (kontrollera etiketten på din TB6600 — kloner kan skilja sig)
+### Referenstabeller (från din TB6600-etikett)
 
-**Microstep (S1–S3):**
+**Microstep (SW1–SW3):**
 
-| Microstep | Puls/varv | S1 | S2 | S3 |
+| Microstep | Puls/varv | SW1 | SW2 | SW3 |
 |---|---|---|---|---|
-| Full (1) | 200 | ON | ON | OFF |
-| 1/2 | 400 | ON | OFF | ON |
-| **1/4** | **800** | **ON** | **OFF** | **OFF** |
-| 1/8 | 1600 | OFF | ON | OFF |
-| 1/16 | 3200 | OFF | OFF | ON |
-| 1/32 | 6400 | OFF | OFF | OFF |
+| NC | — | ON | ON | ON |
+| 1 (full) | 200 | OFF | ON | ON |
+| 2/A | 400 | ON | OFF | ON |
+| 2/B | 400 | OFF | OFF | ON |
+| 4 | 800 | ON | ON | OFF |
+| **8** | **1600** | **OFF** | **ON** | **OFF** |
+| 16 | 3200 | ON | OFF | OFF |
+| 32 | 6400 | OFF | OFF | OFF |
 
-**Ström (S4–S6):**
+**Ström (SW4–SW6):**
 
-| Ström | S4 | S5 | S6 |
-|---|---|---|---|
-| 0.5 A | ON | ON | ON |
-| 1.0 A | ON | OFF | ON |
-| 1.5 A | ON | ON | OFF |
-| 2.0 A | ON | OFF | OFF |
-| 2.5 A | OFF | ON | ON |
-| **2.8 A** | **OFF** | **OFF** | **ON** |
-| 3.0 A | OFF | ON | OFF |
-| 3.5 A | OFF | OFF | OFF |
+| Ström | Peak | SW4 | SW5 | SW6 |
+|---|---|---|---|---|
+| 0.5 A | 0.7 A | ON | ON | ON |
+| 1.0 A | 1.2 A | OFF | ON | ON |
+| 1.5 A | 1.7 A | ON | OFF | ON |
+| 2.0 A | 2.2 A | OFF | OFF | ON |
+| 2.5 A | 2.7 A | ON | ON | OFF |
+| 2.8 A | 2.9 A | OFF | ON | OFF |
+| **3.0 A** | **3.2 A** | **ON** | **OFF** | **OFF** |
+| 3.5 A | 4.0 A | OFF | OFF | OFF |
 
 Vald microstepping måste matcha GRBL `$100/$101/$102` (steg/mm).
 
@@ -127,8 +131,8 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 
 ## Återstående arbete
 
-- [ ] Ställ in DIP-switchar på varje TB6600 enligt sektionen ovan (`ON OFF OFF OFF OFF ON`)
-- [ ] Beräkna och sätt `$100/$101/$102` (steg/mm) i GRBL utifrån kulskruvens stigning och vald microstepping
+- [ ] Ställ in DIP-switchar på varje TB6600 enligt sektionen ovan (`OFF ON OFF ON OFF OFF`)
+- [ ] Beräkna och sätt `$100/$101/$102` (steg/mm) i GRBL utifrån kulskruvens stigning och 1/8 microstep (1600 puls/varv)
 - [ ] Koppla in ändlägesbrytare (shieldens X+/X-/Y+/Y-/Z+/Z- mot GND)
 - [ ] Första provkörning med låg hastighet/acceleration, öka stegvis
 - [ ] Om drift kvarstår: överväg 36–48V PSU-uppgradering för mer marginal på Nema23

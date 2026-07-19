@@ -51,6 +51,15 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 | 5V (shield) | DIR+ |
 | GND (shield, delad mellan alla TB6600) | Gemensam signal-GND |
 
+
+
+<img width="1141" height="1475" alt="image" src="https://github.com/user-attachments/assets/15442fc1-7b4a-45ae-b7e2-f1365c101832" />
+
+<img width="1174" height="1601" alt="image" src="https://github.com/user-attachments/assets/fdebbdfe-bbed-4f82-b416-991dadde3765" />
+
+
+
+
 **Effektsida (PSU → TB6600), delad buss:**
 
 - PSU 24V+ → V+ på alla tre TB6600 (gemensam skruvplint)

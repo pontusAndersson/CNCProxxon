@@ -39,16 +39,31 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 **Anmärkning om spänning:** 24V PSU fungerar men ligger i lägsta laget för Nema23 (TB6600 tål upp till 42V). Kan ge minskat vridmoment vid höga hastigheter — eventuell framtida uppgradering till 36–48V PSU om det blir ett problem.
 
+> **Om PSU-uppgradering:** Stegmotorer är specade i **ström** (4A/fas), inte spänning — TB6600 reglerar strömmen elektroniskt oavsett matningsspänning, så motorerna tar ingen skada av högre spänning. Rekommenderad uppgradering vid behov: **36V** (bra marginal till TB6600:s tak på 42V utan att ligga för nära gränsen). Behåll minst samma amperetal (15A) på det nya PSU:t — strömmen, inte spänningen, avgör hur mycket kraft motorerna kan dra samtidigt. Ingen omkoppling krävs på signalsidan vid PSU-byte.
+
+**Varför inte shieldens inbyggda A4988/DRV8825-socklar?** De klarar max ~2–2,5A per fas (i praktiken ofta mindre pga värme utan aktiv kylning) — otillräckligt för Nema23 (4A/fas). TB6600 har bättre kylkropp och tål kontinuerlig drift vid högre ström. A4988/DRV8825 hade räckt för lättare Nema17-motorer, men inte för detta bygge.
+
 ## Kopplingsschema
 
-**Signalsida (Arduino/Shield → TB6600), per axel — common cathode (gemensam −, styr med +):**
+**Signalsida (Arduino/Shield → TB6600), per axel — common anode (gemensam +, styr med −):**
 
 | Shield-pin | TB6600-pin |
 |---|---|
-| X.STEP / Y.STEP / Z.STEP | PUL+ |
-| X.DIR / Y.DIR / Z.DIR | DIR+ |
-| GND (shield, delad mellan alla TB6600) | PUL− |
-| GND (shield, samma) | DIR− |
+| 5V (shield, delad buss mellan alla tre TB6600) | PUL+ |
+| 5V (shield, samma delade buss) | DIR+ |
+| X.STEP / Y.STEP / Z.STEP (unik per axel) | PUL− |
+| X.DIR / Y.DIR / Z.DIR (unik per axel) | DIR− |
+
+> **Rättelse:** En tidigare version av denna tabell hade polariteten omvänd. Bekräftat korrekt (mot referensdiagram och TB6600-etikett): plus-sidan (PUL+/DIR+) är den **gemensamma** 5V-bussen, minus-sidan (PUL−/DIR−) är den **unika pulsen** per axel från shieldens STEP/DIR-pinnar.
+
+**Enable (ENA) — valfritt:**
+
+ENA styr om drivrutinen håller motorn stumt aktiverad eller släpper den fri (går lätt att snurra för hand, ingen ström). De flesta TB6600 är aktiverade som standard om ENA lämnas okopplad, så detta behövs inte för grundfunktion.
+
+| TB6600-pin | Shield-pin |
+|---|---|
+| ENA+ | 5V (samma delade buss som PUL+/DIR+) |
+| ENA− | EN/GND (gemensam pinne vid RST-knappen — **en enda för alla axlar**, går inte att styra X/Y/Z individuellt) |
 
 
 
@@ -126,6 +141,33 @@ Vald microstepping måste matcha GRBL `$100/$101/$102` (steg/mm).
 <img width="3024" height="4032" alt="IMG_1526" src="https://github.com/user-attachments/assets/854e0fff-7d5d-4755-b6cf-f0700efc435e" />
 
 
+## Ändlägesbrytare
+
+**Typ:** Mekaniska mikrobrytare med rullspak/hävarm, 3-stifts SPDT (NO/NC/COM). Standardlösning för hobby-CNC.
+
+**Antal:** 6 st för full täckning (X−/X+/Y−/Y+/Z−/Z+), eller 3 st om bara en ände per axel behövs (räcker för homing).
+
+**Inköpsförslag:**
+
+| Källa | Exempel |
+|---|---|
+| [3D-shop.se](https://www.3d-shop.se/elektromekanik/brytare/mekanisk-andlagesbrytare) | Mekanisk ändlägesbrytare med 70 cm kabel färdigmonterad, ~14 kr/st |
+| [Electrokit](https://www.electrokit.com) | Svensk lagerhållning, brett urval mikrobrytare |
+| Amazon.se | Sök "mikrobrytare CNC 3 pin" — t.ex. BOJACK KW4A(S), ofta 10-pack |
+
+**Kabel:** Skärmad 2-ledarkabel rekommenderas (minskar brus från motorkablar), alternativt vanlig CAT5/CAT6-nätverkskabel (tvinnade par, fungerar bra och ofta redan till hands).
+
+**Koppling till shieldens END STOPS-header:**
+
+| Brytarpin | Shield-pin |
+|---|---|
+| COM | GND |
+| NO (Normally Open) | Respektive X−/X+/Y−/Y+/Z−/Z+ |
+
+GRBL:s standardkonfiguration förväntar sig NO-kontakten, som drar signalen till GND vid triggning — ingen extra config behövs.
+
+**Montering:** Placera så att spaken trycks in med några mm marginal innan mekaniskt stopp, så maskinen hinner bromsa.
+
 ## Mjukvaruinstallation
 
 1. Installera [Arduino IDE](https://www.arduino.cc/en/software)
@@ -145,9 +187,10 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 
 - [ ] Ställ in DIP-switchar på varje TB6600 enligt sektionen ovan (`OFF ON OFF ON OFF OFF`)
 - [ ] Beräkna och sätt `$100/$101/$102` (steg/mm) i GRBL utifrån kulskruvens stigning och 1/8 microstep (1600 puls/varv)
-- [ ] Koppla in ändlägesbrytare (shieldens X+/X-/Y+/Y-/Z+/Z- mot GND)
+- [ ] Köp in ändlägesbrytare (6 st) + kabel, montera enligt sektionen ovan
+- [ ] Koppla in ändlägesbrytare till shieldens END STOPS-header (NO → axel-pinne, COM → GND)
 - [ ] Första provkörning med låg hastighet/acceleration, öka stegvis
-- [ ] Om drift kvarstår: överväg 36–48V PSU-uppgradering för mer marginal på Nema23
+- [ ] Om drift kvarstår vid höga hastigheter: uppgradera PSU till ~36V (samma eller högre amperetal)
 
 ## CNC Shield V3.0
 
@@ -171,9 +214,26 @@ Expansionskort för Arduino Uno R3/R4 som bryter ut GRBL:s steg-/riktningssignal
 - Shielden ger praktiska anslutningspunkter för STEP, DIR och GND per axel
 - Motorström går **inte** via shielden — den matas direkt PSU → TB6600
 
+## Köpa
+
+- [Nema23-stegmotor 23HS8430D8 (Amazon.se)](https://www.amazon.se/23HS8430D8-Stepper-bipoldrivare-ACT-MOTOR/dp/B08PP84ZYT)
+- [Nema23 CNC-kit med breakout/controller (Amazon.com)](https://www.amazon.com/Nema23-Stepper-FMD2740C-Breakut-Controller/dp/B07236CFKC)
+- [TB6600 / CNC-delar (AliExpress)](https://www.aliexpress.com/item/32843074191.html)
+
 ## Resurser
+
+**Mjukvara**
 
 - GRBL: https://github.com/gnea/grbl
 - UGS: https://winder.github.io/ugs_website/
 - Arduino IDE: https://www.arduino.cc/en/software
+
+**MF70 CNC-konverteringar / inspiration**
+
+- [Aalto Wiki — Proxxon MF70 NC conversion](https://wiki.aalto.fi/display/MEX/Proxxon+MF70+NC+conversion)
+- [CNCZone — Vertical mill/lathe project log](https://www.cnczone.com/forums/vertical-mill-lathe-project-log/145312-cnc.html)
+- [Brokking — Video 74](http://www.brokking.net/Video_74.html)
+- [RCGroups — Proxxon MF70 CNC Mill discussion](https://www.rcgroups.com/forums/showthread.php?1273316-Proxxon-MF70-CNC-Mill-discussion-and-share-ideas)
+- [Alexander Impertro — Proxxon MF70 micro mill CNC conversion](https://alexanderimpertro.wordpress.com/2019/04/27/proxxon-mf70-micro-mill-cnc-conversion/)
+- Another Proxxon MF70 CNC Conversion — Part 1 — Z axis
 

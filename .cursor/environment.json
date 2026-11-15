@@ -1,0 +1,4 @@
+{
+  "name": "Proxxon MF70 GRBL (Arduino)",
+  "install": "bash .cursor/install.sh"
+}

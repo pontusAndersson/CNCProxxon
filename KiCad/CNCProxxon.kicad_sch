@@ -5,7 +5,10 @@
 	(uuid "e63e39d7-6ac0-4ffd-8aa3-1841a4541b55")
 	(paper "A4")
 	(title_block
-		(date "mar. 31 mars 2015")
+		(title "CNCProxxon")
+		(date "2026-11-11")
+		(rev "Uno-stiftlist")
+		(comment 1 "Referens för Arduino Uno-kontakter. Inte MF70-kopplingsschemat.")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x06"
@@ -2160,7 +2163,7 @@
 			(uuid "6a44a55c-6ae0-4d79-b4a1-52d3e48a7065")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "J1")
 					(unit 1)
@@ -2224,7 +2227,7 @@
 			(uuid "25f7f7e2-1fc6-41d8-a14b-2d2742e98c50")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR03")
 					(unit 1)
@@ -2288,7 +2291,7 @@
 			(uuid "fdd33dcf-399e-4ac6-99f5-9ccff615cf55")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR02")
 					(unit 1)
@@ -2351,7 +2354,7 @@
 			(uuid "87fd47b6-2ebb-4b03-a4f0-be8b5717bf68")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR04")
 					(unit 1)
@@ -2442,7 +2445,7 @@
 			(uuid "00a2e9f5-f40a-49ba-91e4-cbef19d3b42b")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "J2")
 					(unit 1)
@@ -2505,7 +2508,7 @@
 			(uuid "dcc7d892-ae5b-4d8f-ab19-e541f0cf0497")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR05")
 					(unit 1)
@@ -2584,7 +2587,7 @@
 			(uuid "57b1224b-fab7-4047-863e-42b792ecf64b")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "J3")
 					(unit 1)
@@ -2669,7 +2672,7 @@
 			(uuid "c0cfa2f9-a894-4c72-b71e-f8c87c0a0712")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "J4")
 					(unit 1)
@@ -2735,7 +2738,7 @@
 			(uuid "6bd03990-0c6f-47aa-a191-9be4dd5032ee")
 		)
 		(instances
-			(project "Arduino_Uno"
+			(project "CNCProxxon"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR01")
 					(unit 1)

@@ -8,7 +8,10 @@
 	)
 	(paper "A4")
 	(title_block
-		(date "mar. 31 mars 2015")
+		(title "CNCProxxon")
+		(date "2026-11-11")
+		(rev "Uno-stiftlist")
+		(comment 1 "Referens för Arduino Uno-kontakter. Inte MF70-kopplingsschemat.")
 	)
 	(layers
 		(0 "F.Cu" signal)
@@ -208,7 +211,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/00000000-0000-0000-0000-000056d71773")
 		(sheetname "/")
-		(sheetfile "Arduino_Uno.kicad_sch")
+		(sheetfile "CNCProxxon.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 -1.33)
@@ -571,7 +574,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/00000000-0000-0000-0000-000056d72f1c")
 		(sheetname "/")
-		(sheetfile "Arduino_Uno.kicad_sch")
+		(sheetfile "CNCProxxon.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 -1.33)
@@ -902,7 +905,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/00000000-0000-0000-0000-000056d72368")
 		(sheetname "/")
-		(sheetfile "Arduino_Uno.kicad_sch")
+		(sheetfile "CNCProxxon.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 -1.33)
@@ -1297,7 +1300,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/00000000-0000-0000-0000-000056d734d0")
 		(sheetname "/")
-		(sheetfile "Arduino_Uno.kicad_sch")
+		(sheetfile "CNCProxxon.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start 1.33 -1.33)

@@ -28,20 +28,20 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 | Komponent | Detaljer |
 |---|---|
 | Maskin | Proxxon MF70, CNC-konverterad med axelkonsoler (X/Y/Z) |
-| Stegmotorer | 3x Nema23 57x57x76mm, 1.8° step, 1.8Nm, 4A/fas |
-| Drivrutiner | 3x TB6600, 4A, 9–42V, 2/4-fas |
-| Styrkort | Arduino Uno + CNC Shield V3.0 (AZDelivery) |
+| Stegmotorer | 3x Nema23 23HS8430, 57×57×76 mm, 1.8°, 1.8–1.9 Nm, 3.0 A/fas |
+| Drivrutiner | 3x TB6600, 9–42 V, upp till 3.5 A (4.0 A peak) |
+| Styrkort | Arduino Uno R3 (ATmega328P) + CNC Shield V3.0 (AZDelivery) |
 | Nätaggregat | MW/MAX S-360-24, 24V 15A (360W) |
 | Mjukvara (dator) | Arduino IDE (flashning), UGS (Universal G-code Sender) |
 | Firmware | GRBL (installerat via Arduino IDE Library Manager) |
 
-**Anmärkning om motorval:** Nema23 är egentligen överdimensionerat för en MF70 (Nema17 hade räckt och gett enklare montering), men motorerna ägdes redan innan projektet startade och används därför ändå. TB6600 klarar strömmen (4A/fas) utan problem.
+**Anmärkning om motorval:** 23HS8430 är egentligen överdimensionerad för en MF70 (Nema17 hade räckt och gett enklare montering), men motorerna ägdes redan innan projektet startade och används därför ändå. Märkdata för den länkade modellen är 3.0 A/fas och cirka 1.8–1.9 Nm. TB6600:s strömtabell går till 3.5 A (4.0 A peak), så inställningen 3.0 A ligger inom drivrutinen. Den nedersta DIP-raden, 3.5 A, ligger över motorns märkström.
 
-**Anmärkning om spänning:** 24V PSU fungerar men ligger i lägsta laget för Nema23 (TB6600 tål upp till 42V). Kan ge minskat vridmoment vid höga hastigheter — eventuell framtida uppgradering till 36–48V PSU om det blir ett problem.
+**Anmärkning om spänning:** 24V PSU fungerar men ligger i lägsta laget för den här motorn (TB6600 tål 9–42 V). Kan ge minskat vridmoment vid höga hastigheter — eventuell framtida uppgradering till ett 36 V-aggregat om det blir ett problem.
 
-> **Om PSU-uppgradering:** Stegmotorer är specade i **ström** (4A/fas), inte spänning — TB6600 reglerar strömmen elektroniskt oavsett matningsspänning, så motorerna tar ingen skada av högre spänning. Rekommenderad uppgradering vid behov: **36V** (bra marginal till TB6600:s tak på 42V utan att ligga för nära gränsen). Behåll minst samma amperetal (15A) på det nya PSU:t — strömmen, inte spänningen, avgör hur mycket kraft motorerna kan dra samtidigt. Ingen omkoppling krävs på signalsidan vid PSU-byte.
+> **Om PSU-uppgradering:** Stegmotorer är specade i **ström** (3.0 A/fas), inte spänning — TB6600 reglerar strömmen elektroniskt oavsett matningsspänning, så motorerna tar ingen skada av högre spänning inom 9–42 V. Rekommenderad uppgradering vid behov: **36 V**, med marginal till taket 42 V. Ett aggregat över 42 V, till exempel 48 V, ligger utanför TB6600 och ska inte användas. Behåll minst samma amperetal (15 A) på det nya PSU:t — strömmen, inte spänningen, avgör hur mycket kraft motorerna kan dra samtidigt. Ingen omkoppling krävs på signalsidan vid PSU-byte.
 
-**Varför inte shieldens inbyggda A4988/DRV8825-socklar?** De klarar max ~2–2,5A per fas (i praktiken ofta mindre pga värme utan aktiv kylning) — otillräckligt för Nema23 (4A/fas). TB6600 har bättre kylkropp och tål kontinuerlig drift vid högre ström. A4988/DRV8825 hade räckt för lättare Nema17-motorer, men inte för detta bygge.
+**Varför inte shieldens inbyggda A4988/DRV8825-socklar?** De klarar max ~2–2,5 A per fas (i praktiken ofta mindre pga värme utan aktiv kylning) — för lite för de här motorerna på 3.0 A/fas. TB6600 har bättre kylkropp och tål kontinuerlig drift vid den strömmen. A4988/DRV8825 hade räckt för lättare Nema17-motorer, men inte för detta bygge.
 
 ## Kopplingsschema
 
@@ -56,14 +56,13 @@ Maskinen kördes ursprungligen med ett TB6560-baserat USB-styrkort (Mach3), men 
 
 > **Rättelse:** En tidigare version av denna tabell hade polariteten omvänd. Bekräftat korrekt (mot referensdiagram och TB6600-etikett): plus-sidan (PUL+/DIR+) är den **gemensamma** 5V-bussen, minus-sidan (PUL−/DIR−) är den **unika pulsen** per axel från shieldens STEP/DIR-pinnar.
 
-**Enable (ENA) — valfritt:**
+**Enable (ENA) — lämna okopplad:**
 
-ENA styr om drivrutinen håller motorn stumt aktiverad eller släpper den fri (går lätt att snurra för hand, ingen ström). De flesta TB6600 är aktiverade som standard om ENA lämnas okopplad, så detta behövs inte för grundfunktion.
+ENA är en offline-ingång. När optokopplaren leder, alltså ENA+ hög och ENA− låg, släpper drivrutinen motorn: axeln går att vrida för hand och pulser ignoreras. Oinkopplad ENA betyder att drivrutinen är aktiverad, och det räcker för det här bygget.
 
-| TB6600-pin | Shield-pin |
-|---|---|
-| ENA+ | 5V (samma delade buss som PUL+/DIR+) |
-| ENA− | EN/GND (gemensam pinne vid RST-knappen — **en enda för alla axlar**, går inte att styra X/Y/Z individuellt) |
+Koppla inte ENA+ till 5V och ENA− till GND. Den kretsen är tänd hela tiden, så motorn står fri.
+
+Vid reset-knappen på CNC Shield V3 sitter två skilda pinnar, EN och GND. EN är D8 och är aktiv låg för shieldens egna A4988/DRV8825. Den signalen är omvänd mot TB6600:s offline-ingång och används inte här.
 
 
 
@@ -73,7 +72,7 @@ ENA styr om drivrutinen håller motorn stumt aktiverad eller släpper den fri (g
 
 <img width="949" height="800" alt="image" src="https://github.com/user-attachments/assets/b91281bd-e02d-4fa9-86f1-89ced905e5a2" />
 
-
+`tb6600-orig.jpg` är ett allmänt kopplingsexempel. Nätdelen på den bilden är S-480-24 (24 V, 20 A) och motorn är 23HS7628, inte S-360-24 och 23HS8430 i tabellen ovan.
 
 **Effektsida (PSU → TB6600), delad buss:**
 
@@ -87,7 +86,7 @@ ENA styr om drivrutinen håller motorn stumt aktiverad eller släpper den fri (g
 - TB6600 A+/A-/B+/B- → motorns två spolpar (identifiera med multimeter om ej märkta)
 - Koppla aldrig loss motorkabel medan strömmen är på
 
-**Viktigt:** Signal-GND (Arduino ↔ TB6600) och effekt-GND (PSU ↔ TB6600) hålls som separata kretsar för att undvika brus, trots att båda till slut delar samma nollpunkt i systemet.
+**Viktigt:** PUL, DIR och ENA går genom optokopplare. Arduino-GND ska inte kopplas till TB6600:s effekt-GND. Nätdelens jord går bara mellan PSU och drivrutinernas GND. Common-anode-kopplingen ovan behöver ingen signaljord till TB6600: strömmen genom optokopplaren går via STEP- eller DIR-pinnen när den dras låg.
 
 ## DIP-switchar (TB6600)
 
@@ -102,8 +101,8 @@ Tabellerna nedan är avskrivna från etiketten på din TB6600 (kloner skiljer si
 | SW1 | **OFF** | |
 | SW2 | **ON** | 1/8 microstep (1600 puls/varv) |
 | SW3 | **OFF** | |
-| SW4 | **OFF** | |
-| SW5 | **ON** | 3.0 A (3.2 A peak) |
+| SW4 | **ON** | |
+| SW5 | **OFF** | 3.0 A (3.2 A peak) |
 | SW6 | **OFF** | |
 
 Kort: `OFF ON OFF ON OFF OFF`
@@ -194,13 +193,13 @@ Möjliga orsaker i prioritetsordning: mekanisk bindning, understäld ström på 
 
 ## CNC Shield V3.0
 
-Expansionskort för Arduino Uno R3/R4 som bryter ut GRBL:s steg-/riktningssignaler till upp till fyra axlar. I detta projekt används shielden **utan** inbyggda A4988/DRV8825 — istället tas STEP/DIR/GND ut till externa TB6600-drivrutiner.
+Expansionskort för Arduino Uno R3 (ATmega328P) som bryter ut GRBL:s steg- och riktningssignaler till upp till fyra axlar. GRBL 1.1 i det här repot kör inte på Uno R4. Shielden används **utan** inbyggda A4988/DRV8825 — STEP, DIR och 5V tas ut till externa TB6600-drivrutiner.
 
 ### Specifikationer
 
 | | |
 |---|---|
-| Kompatibilitet | Arduino Uno R3/R4 |
+| Kompatibilitet | Arduino Uno R3 (ATmega328P). Inte Uno R4 |
 | Drivrutinssocklar | 4 (X, Y, Z, A) |
 | Tänkta drivrutiner | A4988 / DRV8825 *(används ej här)* |
 | Microstepping | Via jumpers på shielden *(irrelevant med TB6600 — ställs på drivrutinen)* |
@@ -211,7 +210,7 @@ Expansionskort för Arduino Uno R3/R4 som bryter ut GRBL:s steg-/riktningssignal
 ### Användning i detta projekt
 
 - Arduino Uno + GRBL ger pulser via USB (UGS)
-- Shielden ger praktiska anslutningspunkter för STEP, DIR och GND per axel
+- Shielden ger anslutningspunkter för STEP, DIR och 5V per axel
 - Motorström går **inte** via shielden — den matas direkt PSU → TB6600
 
 ## Köpa
@@ -235,5 +234,4 @@ Expansionskort för Arduino Uno R3/R4 som bryter ut GRBL:s steg-/riktningssignal
 - [Brokking — Video 74](http://www.brokking.net/Video_74.html)
 - [RCGroups — Proxxon MF70 CNC Mill discussion](https://www.rcgroups.com/forums/showthread.php?1273316-Proxxon-MF70-CNC-Mill-discussion-and-share-ideas)
 - [Alexander Impertro — Proxxon MF70 micro mill CNC conversion](https://alexanderimpertro.wordpress.com/2019/04/27/proxxon-mf70-micro-mill-cnc-conversion/)
-- Another Proxxon MF70 CNC Conversion — Part 1 — Z axis
 
